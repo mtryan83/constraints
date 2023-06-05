@@ -1146,10 +1146,10 @@ end
 @exception msgerror msg::String
 @msgerror ADMException "ADM struct error" e.msg
 function validate_ADM(adm::ADM)
-    if !(adm.rm == adm.m_mass/adm.e_mass && adm.rm==adm.m/adm.m_e)
+    if !(adm.rm ≈ adm.m_mass/adm.e_mass && adm.rm ≈ adm.m/adm.m_e)
         throw(ADMException("e_d mismatch: rm=$(adm.rm) m_mass/e_mass=$(adm.m_mass/adm.e_mass) m/m_e=$(adm.m/adm.m_e)"))
     end
-    if !(adm.rM == adm.M_mass/adm.p_mass && adm.rM==adm.M/adm.m_p)
+    if !(adm.rM ≈ adm.M_mass/adm.p_mass && adm.rM ≈ adm.M/adm.m_p)
         throw(ADMException("p_d mismatch: rM=$(adm.rM) M_mass/p_mass=$(adm.M_mass/adm.p_mass) M/m_p=$(adm.M/adm.m_p)"))
     end
     if !(0 <= adm.ϵ <= 1)
