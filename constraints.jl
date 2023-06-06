@@ -1,5 +1,6 @@
 using LazyGrids
 using PyPlot
+using Statistics
 
 # Someday it would be nice to use the following for the Properties
 #using Measurements
@@ -48,9 +49,9 @@ g_to_gev = 5.6096e23
 gev_to_g = 1/g_to_gev
     
 # Proton and electron masses
-mP = 0.938 # GeV
-mE = 511   # keV
-alpha = 0.00729
+#mP = 0.938 # GeV
+#mE = 511   # keV
+#alpha = 0.00729
     
     
 H(a) = H0*sqrt(OmegaL + OmegaM./a.^3 + OmegaR./a.^4 + (1-OmegaL-OmegaM-OmegaR)./a.^2)
@@ -165,7 +166,7 @@ function getLSSProperties()
         f = 2*a0*a1*F
         return f
     end
-    println("truncated sigma:$(truncatedSigma(a0,a1,1e-30,5.77))")
+    #println("truncated sigma:$(truncatedSigma(a0,a1,1e-30,5.77))")
     z=[0.89,0.39,0.4,0.87,0.39,0.36,0.88,0.6,0.45,0.28,0.6,0.67,0.6,
             0.63,1.05,0.66,0.75,0.53,0.23,0.07,1.12,0.7,0.28,0.42,0.39,
             0.43,0.4,0.8,0.95,0.58,0.99,1.11,0.42,0.8,0.41,0.44,0.88,0.65,
@@ -259,6 +260,20 @@ function calcMassLossConstraint(properties::Properties,adm::ADM)
         x_DM=has_x ? x_D(adm.rM) : nothing,
         n_DM=!has_x ? n : nothing         # Revisit this. It's supposed to be n_DM
     )
+    
+    # This currently can produce upwards of 100 lines for certain properties 
+    # (Looking at you getDBCProperties). Which takes forever to run 
+    # get_Lambda on. So we'll reduce to 3 lines - max at every M, min at every
+    # M, and median
+    if size(Lambda_cons)[2]>3
+        max_inds = argmax(Lambda_cons,dims=2)
+        med = median(Lambda_cons,dims=2)
+        med_inds = argmin(abs.(Lambda_cons.-med),dims=2)
+        min_inds = argmin(Lambda_cons,dims=2)
+        inds = [min_inds med_inds max_inds]
+        return @views Lambda_cons[inds], direction, n[inds], T[inds]
+    end
+    
     return Lambda_cons,direction,n,T
 end
 
@@ -346,7 +361,7 @@ function plotConstraint(properties,adm::ADM;fig=nothing,name=nothing)
     end
     if isnothing(fig)
         ylim(1e-35, 1e-18)
-        xlim(1e2, 1e10)
+        xlim(1e0, 1e10)
         grid()
         return gcf,h
     end
