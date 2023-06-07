@@ -25,13 +25,8 @@ py"""
 
 
 
-###########################################
 import numpy as np
 from scipy.integrate import quad
-#import cnsts
-#from cnsts import aDM
-###########################################
-
 
 HBAR = 1.054571817e-27  # erg s
 H = 6.62607015e-27      # erg s
@@ -44,7 +39,6 @@ m_SM = 9.109e-28        # g
 M_SM = 1.673e-24        # g
 a_SM = 7.2973525693e-3  #
 m_SM_eV = 5.11e8
-
 
 class aDM:
     def __init__(self, r_m, r_M, r_a, xi, epsilon, z):
@@ -62,7 +56,7 @@ class react_network:
         ################ Parameters
         ############################################
         ADM = aDM(r_m, r_M, r_a, xi, epsilon, z)
-
+        
         ## Dark Parameter Rescaling ##
         self.r_m = r_m
         self.r_M = r_M
@@ -99,19 +93,19 @@ class react_network:
 
     ## p + e -> H ## Rosenberg & Fan 2017 ##
     def k1(self, T):
-        #def argument(u):
-        #    lst = np.logspace(0, 1000, 50, base=10)
-        #    def sum_argument(n):
-        #       return ((u) * np.exp(- (u ** 2))) / (((u ** 2) * (n ** 3)) + ((self.atom_bind(T) ** 2) * n))
-        #
-        #    return sum(list(map(sum_argument, lst)))
-        #return ((HBAR ** 2) * (C ** 2)) * (self.a ** 5) * ((((2 ** 11) * (np.pi)) / ((3 ** 3) * (self.m) * ((K_B * T) ** 3))) ** (1 / 2)) * quad(argument, 0, np.Infinity)[0]
-        y2 = ((511000 * self.r_m)*((a_SM * self.r_a) ** 2) / (2 * K_B_EV * T))
-        y2lim = 16*T*y2
-        if y2lim > 0.25:
-            return 8.4e-14 * (((self.r_a * a_SM)/(1e-2)) ** 3) * ((self.r_m) ** -1.5) * ((1e5/T) ** 0.5) * (1.744 + np.log10(y2) + 1) 
-        else:
-            return 1.3e-15 * (((self.r_a * a_SM)/1.e-2)**5) * ((1/(self.r_m))**0.5 ) * (1e6 / T)**(1.5) * ( -4.66 - 15 * np.log10(y2) + y2 * (5.42 - 14 * np.log10(y2) ) )
+        def argument(u):
+            lst = np.logspace(0, 100, 50, base=10)
+            def sum_argument(n):
+               return ((u) * np.exp(- (u ** 2))) / (((u ** 2) * (n ** 3)) + ((self.atom_bind(T) ** 2) * n))
+            return sum(list(map(sum_argument, lst)))
+        return ((HBAR ** 2) * (C ** 2)) * (self.a ** 5) * ((((2 ** 11) * (np.pi)) / ((3 ** 3) * (self.m) * ((K_B * T) ** 3))) ** (1 / 2)) * quad(argument, 0, np.Infinity)[0]
+        #y2 = ((511000 * self.r_m)*((a_SM * self.r_a) ** 2) / (2 * K_B_EV * T))
+        #y2lim = 16*T*y2
+        #return y2lim
+        #if y2lim > 0.25:
+        #    return 8.4e-14 * (((self.r_a * a_SM)/(1e-2)) ** 3) * ((self.r_m) ** -1.5) * ((1e5/T) ** 0.5) * (1.744 + np.log10(y2) + 1) 
+        #else:
+        #    return 1.3e-15 * (((self.r_a * a_SM)/1.e-2)**5) * ((1/(self.r_m))**0.5 ) * (1e6 / T)**(1.5) * ( -4.66 - 15 * np.log10(y2) + y2 * (5.42 - 14 * np.log10(y2) ) )
 
 
 
@@ -292,6 +286,7 @@ class abundances:
         ADM = aDM(r_m, r_M, r_a, xi, epsilon, z)
         RN = react_network(n, r_m, r_M, r_a, xi, epsilon, z)
 
+        
         ## Dark Parameter Rescaling ##
         self.r_m = r_m
         self.r_M = r_M
@@ -334,7 +329,12 @@ class abundances:
         self.x_H2 = x_H2_pre * 0.5 * np.exp((- K_B_EV * self.T)/((self.r_a ** 2) * (self.r_m) * 4480))
         self.x_Hneg = (self.x_e * self.x_p * self.Rec)/(self.x_H * self.k3 + self.x_p * self.k9)
         self.x_H2pl = (self.x_H * self.x_p * self.k4 + self.x_H2 * self.x_p * self.k7 + self.x_H * self.x_H * self.x_p * self.n * self.k14)/(self.x_H * self.k5 + self.x_e * self.k10 + self.x_H2 * self.k15)
-        self.x_H3pl = (self.x_H2pl * self.x_H2 * self.k15)/(self.x_e * self.k16)
+        #self.x_H3pl_temp = (self.x_H2pl * self.x_H2 * self.k15)/(self.x_e * self.k16)
+        if self.x_H2pl * self.x_H2 < 1e-120:
+            self.x_H3pl = 0
+        else:
+            self.x_H3pl = (self.x_H2pl * self.x_H2 * self.k15)/(self.x_e * self.k16)
+            
         
     
 
@@ -349,7 +349,7 @@ class atomic:
 ############################################
         ADM = aDM(r_m, r_M, r_a, xi, epsilon, z)
         abund = abundances(n, T, x_H2_pre, r_m, r_M, r_a, xi, epsilon, z)
-
+        
         ## Dark Parameter Values ##
         self.m = m_SM * ADM.r_m
         self.m_eV = m_SM_eV * ADM.r_m
@@ -445,7 +445,7 @@ class atomic:
 ############################################
 
     def total_dark_atomic_cooling(self, n, T):  ## ergs/cm*s ##
-        return (self.n_H * self.n_e * self.atomic_collisional_ion(T)) + (self.n_e * self.n_p * self.recombination(T)) + (self.n_e * self.n_p * self.bremstrahlung(T)) + (self.n_H * self.n_e * self.atomic_collisional_excitation(T)) + (self.n_e * self.compton_scat(T))
+        return (self.x_H * self.x_e * self.atomic_collisional_ion(T)) + (self.x_e * self.x_p * self.recombination(T)) + (self.x_e * self.x_p * self.bremstrahlung(T)) + (self.x_H * self.x_e * self.atomic_collisional_excitation(T)) + (self.x_e * self.compton_scat(T))
 ############################################
 ############################################
 
@@ -464,6 +464,7 @@ class molecular:
         ADM = aDM(r_m, r_M, r_a, xi, epsilon, z)
         abund = abundances(n, T, x_H2_pre, r_m, r_M, r_a, xi, epsilon, z)
         RN = react_network(n, r_m, r_M, r_a, xi, epsilon, z)
+
 
         ## Dark Parameter Values ##
         self.m = m_SM * ADM.r_m
@@ -860,7 +861,7 @@ class molecular:
 
     ## Total DM LD Molecular Cooling ##
     def total_DM_LD_cool(self, n, T):
-        return ((self.n_H2 * self.H2_H2_DM_coll(T))+ (self.n_H *self.H_H2_DM_coll(T)) + (self.n_e * self.e_H2_DM_coll(T)) + (self.n_p * self.p_H2_DM_coll(T)))
+        return ((self.x_H2 * self.H2_H2_DM_coll(T))+ (self.x_H *self.H_H2_DM_coll(T)) + (self.x_e * self.e_H2_DM_coll(T)) + (self.x_p * self.p_H2_DM_coll(T)))
 
 
 ############################################
@@ -922,7 +923,7 @@ class molecular:
 ############################################
 
     def Chem_Cooling(self, n, T):
-        return (((self.r_a ** 2) * (self.r_m) * (-4.48 * E)) * self.n_H2 * self.n_H * self.k8) + (((self.r_a ** 2) * (self.r_m) * (-1.83 * E)) * self.n_Hneg * self.n_H * self.k4)
+        return (((self.r_a ** 2) * (self.r_m) * (4.48 * E)) * self.n_H2 * self.n_H * self.k8) + (((self.r_a ** 2) * (self.r_m) * (1.83 * E)) * self.n_Hneg * self.n_H * self.k4)
 
 
 ############################################
@@ -936,7 +937,10 @@ class molecular:
         V_LTE_DM = self.V_DM(T)
         tot_LTE_DM = self.HDL(T)
         tot_LD_DM = self.total_DM_LD_cool(n, T)
-        return ((self.n_H2 * (R_LTE_DM + V_LTE_DM))/(1 + ((R_LTE_DM + V_LTE_DM)/(tot_LD_DM)))) + self.Chem_Cooling(n, T)
+        if tot_LD_DM <= 1e-215:
+            return self.x_H2 * tot_LTE_DM
+        else:
+            return ((self.x_H2 * (R_LTE_DM + V_LTE_DM))/(1 + ((R_LTE_DM + V_LTE_DM)/(tot_LD_DM)))) + self.Chem_Cooling(n, T)
 
 ############################################
 ############################################
@@ -953,6 +957,7 @@ class heating:
         abund = abundances(n, T, x_H2_pre, r_m, r_M, r_a, xi, epsilon, z)
         RN = react_network(n, r_m, r_M, r_a, xi, epsilon, z)
 
+        
         ## Dark Parameter Rescaling ##
         self.r_m = r_m
         self.r_M = r_M
@@ -1010,10 +1015,10 @@ class heating:
         return ((3 * np.pi)/(32 * G_N * rho)) ** (1/2)
 
     def Compressional_Heating(self, n, T):
-        return ((n * K_B * T)/ self.t_ff(n))
+        return ((K_B * T)/ (n * self.t_ff(n)))
 
     def Chemical_Heating(self, n, T):
-        return (((self.r_m) * (self.r_a ** 2) * 3.53 * E) * self.n_Hneg * self.n_H * self.k3) + (((self.r_m) * (self.r_a ** 2) * 1.83 * E) * self.n_H2 * self.n_p * self.k7) + (((self.r_m) * (self.r_a ** 2) * 4.48 * E) * (self.n_H ** 3) * self.k11) + (((self.r_m) * (self.r_a ** 2) * 4.48 * E) * (self.n_H ** 2) * self.n_H2 * self.k12) 
+        return (((self.r_m) * (self.r_a ** 2) * 3.53 * E) * self.x_Hneg * self.x_H * self.k3) + (((self.r_m) * (self.r_a ** 2) * 1.83 * E) * self.x_H2 * self.x_p * self.k7) + (((self.r_m) * (self.r_a ** 2) *4.48 * E) * n * (self.x_H ** 3) * self.k11) + (((self.r_m) * (self.r_a ** 2) * 4.48 * E) * n * (self.x_H ** 2) * self.x_H2 * self.k12) 
 
     def Heating(self, n, T):
         return self.Chemical_Heating(n, T) + self.Compressional_Heating(n, T)
@@ -1025,7 +1030,6 @@ class heating:
 def get_Lambda(n,T, x_H2_pre , r_m, r_M, r_a, xi, epsilon, z):
     # Make Lambda return heating #
     #return heating(n,T, x_H2_pre , r_m, r_M, r_a, xi, epsilon, z).Heating(n, T)
-    
     # Make Lambda return cooling #
     return molecular(n,T, x_H2_pre , r_m, r_M, r_a, xi, epsilon, z).total_DM_Molecular_Cooling(n, T) + atomic(n, T, x_H2_pre, r_m, r_M, r_a, xi, epsilon, z).total_dark_atomic_cooling(n, T)
 
