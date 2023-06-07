@@ -286,9 +286,9 @@ end
 function checkMassLossConstraint(Lambda,properties,adm::ADM;n_test=nothing)
     Lambda_cons, direction, n, T = calcMassLossConstraint(properties,adm)
     if isnothing(n_test)
-        Lambda_test = Lambda.(n,T)
+        Lambda_test = Lambda.(n,T;adm)
     else
-        Lambda_test = Lambda.(n_test,T)
+        Lambda_test = Lambda.(n_test,T;adm)
     end
     # Could write this with short-circuiting booleans, but this is cleaner
     check = direction==above ? Lambda_test.<=Lambda_cons : Lambda_test.>=Lambda_cons
