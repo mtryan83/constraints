@@ -7,6 +7,7 @@ using Statistics
 
 import FromFile: @from
 
+@from "adm.jl" using ADM_mod
 @from "Get_Lambda.jl" using Get_Lambda
 #include("Get_Lambda.jl")
 #using .Get_Lambda
