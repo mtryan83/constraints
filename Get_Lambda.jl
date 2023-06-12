@@ -10,6 +10,9 @@ using LaTeXStrings
 using Statistics
 using Printf
 using PyCall
+import FromFile: @from
+
+@from "adm.jl" using ADM_mod
 
 #### Class Structure ####
 
