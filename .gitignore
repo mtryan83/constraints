@@ -23,4 +23,6 @@ docs/site/
 # environment.
 Manifest.toml
 
+*.jld2
+
 .ipynb_checkpoints/
