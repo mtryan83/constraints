@@ -17,15 +17,15 @@ import FromFile: @from
 # Defining global constants
 # Move constants from above if they end up being used in subfunctions
 # Hopefully, these should just be fundamental physical constants
-G_cgs = 6.67259e-8 # cgs 
-kb_keV = 8.617e-8 # keV/K
-kb_geV = 8.617e-14 # GeV/K
-kb_erg = 1.38065e-16 # erg/K
-planck = 4.135667696e-18 # keV*s
-age_of_universe = 13.797 # Gyr
-c_cm = 2.998e10 # cm/s
-c_km = 2.998e5 #  km/s
-kev_to_erg = 1.602e-9
+const G_cgs = 6.67259e-8 # cgs 
+const kb_keV = 8.617e-8 # keV/K
+const kb_geV = 8.617e-14 # GeV/K
+const kb_erg = 1.38065e-16 # erg/K
+const planck = 4.135667696e-18 # keV*s
+const age_of_universe = 13.797 # Gyr
+const c_cm = 2.998e10 # cm/s
+const c_km = 2.998e5 #  km/s
+const kev_to_erg = 1.602e-9
 
 # Using Planck 2018 data for cosmological constants
 h = 0.67019
@@ -43,11 +43,11 @@ Omega = OmegaM
 delta = 18*pi^2
 
 
-s_to_gy = 3.17098e-17 
-gy_to_s = 3.154e16
-m_sol_to_g = 1.9891e33 
-g_to_gev = 5.6096e23
-gev_to_g = 1/g_to_gev
+const s_to_gy = 3.17098e-17 
+const gy_to_s = 3.154e16
+const m_sol_to_g = 1.9891e33 
+const g_to_gev = 5.6096e23
+const gev_to_g = 1/g_to_gev
     
 # Proton and electron masses
 #mP = 0.938 # GeV
