@@ -1,0 +1,18 @@
+#This option file has been automatically generated
+#Mon May 14 15:13:25 2018
+
+-n react_dark
+
+
+-unsafe
+-skipODEthermo
+# Note that by default, the collapseZ test does not have ATOMIC or FF cooling
+# Also, DARKATOM and ADARKATOM are mutually incompatible, so only use one or the other
+-cooling=H2,COMPTON,CHEM,ADARKATOM,DARKMOL,ATOMIC,FF
+-heating=COMPRESS,ADARKATOM,DARKMOL
+-H2opacity=RIPAMONTI
+-gamma=FULL
+-conserve
+#-nomassCheck
+#-noRecCheck
+#-useEquilibrium
