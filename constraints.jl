@@ -1,6 +1,7 @@
 using LazyGrids
 using PyPlot
 using Statistics
+using Interpolations
 
 # Someday it would be nice to use the following for the Properties
 #using Measurements
@@ -428,6 +429,38 @@ function plotConstraint(properties,adm::ADM;fig=nothing,name=nothing,ctype::cons
         linestyle=nothing
     end
     h = loglog(T, Lambda_cons;marker,linestyle,label=name)
+    midT = mean(log10.([minimum(T),maximum(T)]))
+    if size(T)[2]>1
+        x = log10.(vec(T[:,1]))
+    else
+        x = log10.(vec(T))
+    end
+    y = vec(minimum(Lambda_cons,dims=2))
+    if length(x)==1
+        # we have a 1xn vector, just use everything
+        x = log10.(vec(T))
+        y = vec(Lambda_cons)
+        #println("We have a 1x$(size(T)[2]) vector. Switching to using everything:\nx=$x\ny=$y")
+    end
+    if length(x)>1
+        inds = sortperm(x)
+        x = x[inds]
+        y = y[inds]
+        Interpolations.deduplicate_knots!(x,move_knots=true)
+        Lambda_fit = linear_interpolation(x,y)
+        y1 = Lambda_fit(midT)
+    else
+        y1 = y
+    end
+    if direction==above # allowed arrow points down
+        # Needs to be done in logspace - makes this trickier
+        y2 = y1/10
+    else
+        y2 = y1*10
+    end
+    col = h[1].get_color()
+    PyPlot.annotate("",xytext=(10^midT,y1),xy=(10^midT,y2),arrowprops=Dict("arrowstyle"=>"->","facecolor"=>col,"edgecolor"=>col))
+    #println("x=$midT\ny=$(Lambda_fit[midT])\nx+dx=$midT\ny+dy=$(y)")
     if size(h)[1]>1
         for h1 in h
             h1.update_from(h[1])
