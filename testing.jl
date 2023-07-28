@@ -23,6 +23,17 @@
 
 # %%
 include("constraints.jl")
+import FromFile: @from
+@from "../get_Lambda/get_lambda.jl" using Get_Lambda_module
+import .Get_Lambda_module: get_Lambda
+
+# %% [markdown]
+# ## Define ADM version of get_Lambda
+
+# %%
+function get_Lambda(n,T;adm::ADM=ADM())
+    return get_Lambda(n, T, adm.z, adm.ϵ, adm.rm, adm.rM, adm.rα, adm.ξ)
+end
 
 # %% [markdown]
 # ## Define plotting functions

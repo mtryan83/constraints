@@ -9,7 +9,8 @@ using Interpolations
 import FromFile: @from
 
 @from "adm.jl" using ADM_mod
-@from "Get_Lambda.jl" using Get_Lambda
+# We don't actually call get_Lambda here, we assume it's an input
+#@from "get_Lambda/get_lambda.jl" using Get_Lambda_module
 #include("Get_Lambda.jl")
 #using .Get_Lambda
 
