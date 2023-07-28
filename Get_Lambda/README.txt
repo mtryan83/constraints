@@ -1,5 +1,0 @@
-The Get_Lambda module is a julia module to return a cooling table in density and temperature space for a given choice of aDM parameters and redshift. 
-
-Currently it's ran over two recombination timescales, but to modify the length of time you'd like to run over, add t_lim as an argument in the generate_test function in the DK_mods.jl file. Also uncomment line 429 and add "$t_lim" and comment out line 515. Finally in the Get_Lamda.jl file, update the generate_test function calls.
-
-To set up the module, first move the darkEquil file to the tests file in darkkrome. Next update the darkkrome file in the darkkrome directory to the one included. Next update the path variables in the Get_Lambda.jl file. Finally create a function to return the values of Lambda over T for a given density from the cooling table. The documentation for NamedArrays can be found at this link: https://github.com/davidavdav/NamedArrays.jl
